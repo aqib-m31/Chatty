@@ -193,7 +193,8 @@ class ChattyAppViewModel(
                                 ),
                                 joinedRoomName = "",
                                 joinedRoomId = "",
-                                joinedRoom = false
+                                joinedRoom = false,
+                                message = message
                             )
                         }
                         _chatState.update { currentState ->
@@ -216,7 +217,7 @@ class ChattyAppViewModel(
 
                     viewModelScope.launch {
                         _chatState.update { currentState ->
-                            val clearMessages: Boolean = roomId != _userState.value.joinedRoomId
+                            val clearMessages: Boolean = roomName != _userState.value.joinedRoomName
                             currentState.copy(
                                 currentRoomMessages = if (clearMessages) emptyList() else currentState.currentRoomMessages
                             )
@@ -349,16 +350,22 @@ class ChattyAppViewModel(
                     val data = args[0] as JSONObject
                     try {
                         val message = data.getString("message")
-                        _userState.update { currentState ->
-                            currentState.copy(
-                                message = message,
-                                joinedRoom = false,
-                                joinedRoomId = "",
-                                joinedRoomName = "",
-                            )
-                        }
-                        _chatState.update { currentState ->
-                            currentState.copy(currentRoomMessages = emptyList())
+                        viewModelScope.launch {
+                            _userState.update { currentState ->
+                                currentState.copy(
+                                    message = message,
+                                    joinedRoom = false,
+                                    joinedRoomId = "",
+                                    joinedRoomName = "",
+                                    joinedRooms = userRepository.getRooms(
+                                        _userState.value.accessToken,
+                                        _userState.value.username
+                                    )
+                                )
+                            }
+                            _chatState.update { currentState ->
+                                currentState.copy(currentRoomMessages = emptyList())
+                            }
                         }
                     } catch (e: JSONException) {
                         Log.d("SOCKET LEAVE", e.message.toString())
@@ -374,7 +381,6 @@ class ChattyAppViewModel(
      * Joins a room. It emits a "join" or "switch" event to the socket.
      */
     fun joinRoom(roomId: String = _userState.value.joinedRoomId) {
-        Log.d("TEST", userState.value.toString())
         val joinedRoomId = _userState.value.joinedRoomId
         val joinObject = JSONObject()
             .put("roomId", roomId)
