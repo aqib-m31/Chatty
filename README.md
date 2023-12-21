@@ -1,5 +1,7 @@
 # Chatty
 Chatty is an Android app designed as the final project for CS50x, providing users with a platform to connect through chat rooms. The app encompasses essential features such as authentication, real-time messaging, and seamless room management. Built with Jetpack Compose and following the MVVM architecture, Chatty delivers a modern and intuitive user experience.
+
+[Project Demo](https://youtu.be/PWJT77xy67c?si=JzBYxVbDB3jAFkF-)
 <p style="text-align:center;"><img src="app\src\main\res\drawable-nodpi\chatty.png" width=100></p>
 <p style="text-align:center;"><a href="https://www.freepik.com/free-vector/cute-bot-say-users-hello-chatbot-greets-online-consultation_4015765.htm#&position=0&from_view=author&uuid=cfb046d1-293f-4289-bde8-8e06133eb50f">Image by roserodionova</a> on Freepik</p>
 
