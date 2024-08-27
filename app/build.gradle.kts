@@ -5,6 +5,10 @@ val envPropertiesFile = rootProject.file("env.properties")
 val envProperties = Properties()
 envProperties.load(FileInputStream(envPropertiesFile))
 
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -14,6 +18,15 @@ plugins {
 android {
     namespace = "com.aqib.chatty"
     compileSdk = 34
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(keystoreProperties.getProperty("STORE_FILE"))
+            storePassword = keystoreProperties.getProperty("STORE_PASSWORD")
+            keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
+            keyPassword = keystoreProperties.getProperty("KEY_PASSWORD")
+        }
+    }
 
     defaultConfig {
         applicationId = "com.aqib.chatty"
@@ -47,6 +60,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
