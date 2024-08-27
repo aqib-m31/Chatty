@@ -72,3 +72,6 @@ To generate the APK, use the following commands from the project root:
 ./gradlew assembleDebug  # For the debug APK
 ./gradlew assembleRelease  # For the release APK
 ```
+
+> [!NOTE]
+> In case of any issues, check out the steps here to debug: [Chatty | Wiki](https://github.com/aqib-m31/Chatty/wiki)
