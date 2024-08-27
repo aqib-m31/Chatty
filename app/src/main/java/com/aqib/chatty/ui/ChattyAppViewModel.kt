@@ -262,7 +262,12 @@ class ChattyAppViewModel(
                         socket?.connect()
                         setup()
                         _userState.update { currentState ->
-                            currentState.copy(message = "Connected Successfully!")
+                            currentState.copy(message = "Connecting... May be the server is booting up!")
+                        }
+                        socket?.on(Socket.EVENT_CONNECT) {
+                            _userState.update { currentState ->
+                                currentState.copy(message = "Connected Successfully!")
+                            }
                         }
                     }
                 }
@@ -485,6 +490,10 @@ class ChattyAppViewModel(
      * Sends a message. It emits a "message" event to the socket.
      */
     fun sendMessage() {
+        if (chatUiState.value.currentMessage.isEmpty()) {
+            return;
+        }
+
         if (socket?.connected() == true) {
             val message = Message(
                 text = chatUiState.value.currentMessage,
