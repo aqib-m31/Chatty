@@ -47,3 +47,4 @@ google-services.json
 .cxx
 
 env.properties
+keystore.properties
