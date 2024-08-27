@@ -1,0 +1,20 @@
+{
+    "name": "Chatty Dev Environment",
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "postCreateCommand": "bash .devcontainer/setup.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "ms-vscode.cpptools",
+                "redhat.java"
+            ]
+        }
+    },
+    "remoteEnv": {
+        "STORE_FILE": "/workspaces/Chatty/chatty.keystore",
+        "SDK_DIR": "/home/codespace/android-sdk",
+        "SERVER_URL_DEBUG": "http://192.168.XXX.XXX",
+        "SERVER_URL_RELEASE": "https://XX-chatty-placeholder-XX.com"
+    }
+}
