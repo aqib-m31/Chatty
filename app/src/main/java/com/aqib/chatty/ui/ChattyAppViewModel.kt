@@ -48,7 +48,8 @@ data class UserState(
     val joinedRoom: Boolean = false,
     val joinedRooms: UserRooms = UserRooms(own = emptyList(), others = emptyList()),
     val errors: List<String> = emptyList(),
-    val message: String = ""
+    val message: String = "",
+    val homeScreenMessage: String = ""
 )
 
 /**
@@ -119,39 +120,47 @@ class ChattyAppViewModel(
                 _userState.update { currentState ->
                     currentState.copy(
                         username = username,
+                        homeScreenMessage = "Establishing connection! It may take up to a minute!"
                     )
                 }
+            }
+        }
+    }
 
-                if (_userState.value.authenticated) {
-                    try {
-                        val rooms = userRepository.getRooms(_userState.value.accessToken, username)
-                        _userState.update { currentState ->
-                            currentState.copy(
-                                joinedRooms = rooms
-                            )
-                        }
-                    } catch (e: retrofit2.HttpException) {
-                        Log.d("INIT RETRIEVE ROOMS", "${e.message}")
-                        if (e.code() in 400..499) {
-                            _userState.update { currentState ->
-                                currentState.copy(
-                                    message = "FORBIDDEN",
-                                    authenticated = false
-                                )
-                            }
-                        } else {
-                            _userState.update { currentState ->
-                                currentState.copy(
-                                    message = "SERVER ERROR"
-                                )
-                            }
-                        }
-                    } catch (e: IOException) {
-                        Log.d("INIT RETRIEVE ROOMS", e.message.toString())
-                    } catch (e: Exception) {
-                        Log.d("INIT RETRIEVE ROOMS", e.message.toString())
+    /**
+    * Fetches the list of rooms for the authenticated user and updates the user state with the retrieved rooms.
+    * !! Called after the socket connection is successfully established.
+    */
+    private fun fetchRooms() {
+        viewModelScope.launch {
+            try {
+                val rooms = userRepository.getRooms(_userState.value.accessToken, _userState.value.username)
+                _userState.update { currentState ->
+                    currentState.copy(
+                        joinedRooms = rooms,
+                        homeScreenMessage = if (rooms.own.isEmpty() && rooms.others.isEmpty()) "You haven't joined any rooms!" else "",
+                    )
+                }
+            } catch (e: retrofit2.HttpException) {
+                Log.d("INIT RETRIEVE ROOMS", "${e.message}")
+                if (e.code() in 400..499) {
+                    _userState.update { currentState ->
+                        currentState.copy(
+                            message = "FORBIDDEN",
+                            authenticated = false
+                        )
+                    }
+                } else {
+                    _userState.update { currentState ->
+                        currentState.copy(
+                            message = "SERVER ERROR"
+                        )
                     }
                 }
+            } catch (e: IOException) {
+                Log.d("INIT RETRIEVE ROOMS", e.message.toString())
+            } catch (e: Exception) {
+                Log.d("INIT RETRIEVE ROOMS", e.message.toString())
             }
         }
     }
@@ -262,12 +271,13 @@ class ChattyAppViewModel(
                         socket?.connect()
                         setup()
                         _userState.update { currentState ->
-                            currentState.copy(message = "Connecting... May be the server is booting up!")
+                            currentState.copy(message = "Connecting... Server is booting up! It'll take upto a minute!")
                         }
                         socket?.on(Socket.EVENT_CONNECT) {
                             _userState.update { currentState ->
                                 currentState.copy(message = "Connected Successfully!")
                             }
+                            fetchRooms()
                         }
                     }
                 }

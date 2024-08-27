@@ -132,7 +132,8 @@ fun ChattyApp() {
                     isJoined = viewModel::isJoined,
                     onShare = { subject: String, roomId: String ->
                         shareRoomId(context = context, subject = subject, roomId = roomId)
-                    }
+                    },
+                    message = userState.value.homeScreenMessage
                 )
             }
             composable(route = ChattyAppScreen.CreateRoom.name) {

@@ -64,6 +64,7 @@ fun HomeScreen(
     onDeleteRoom: (String) -> Unit,
     isJoined: (String) -> Boolean,
     onShare: (String, String) -> Unit,
+    message: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -121,7 +122,7 @@ fun HomeScreen(
                     .weight(1f)
                     .padding(vertical = dimensionResource(id = R.dimen.padding_medium))
             ) {
-                Text(text = "You haven't joined any rooms.")
+                Text(text = message)
             }
         } else {
             LazyColumn(
@@ -268,7 +269,8 @@ fun HomeScreenPreview() {
             onJoinRoom = {},
             onDeleteRoom = {},
             isJoined = { _ -> false },
-            onShare = { _, _ -> {} }
+            onShare = { _, _ -> {} },
+            message = ""
         )
     }
 }
